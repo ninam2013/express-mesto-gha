@@ -55,23 +55,9 @@ const createUser = (req, res) => {
 const updateProfile = (req, res) => {
   // обнавляем данные пользователя по _id
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
-    .then((user) => {
-      // 1 name.length < 2
-      // if (!name || !about) {
-      //   res.status(400).send({ message: 'Переданы некорректные данные' });
-      //   return;
-      // }
-      if (name.length < 2 || name.length > 30) {
-        return res.status(400).send({ message: 'Переданы некорректные данные name' });
-      }
-      if (about.length < 2 || about.length > 30) {
-        return res.status(400).send({ message: 'Переданы некорректные данные about' });
-      }
-      return res.status(200).send({ data: user });
-    })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      // 1 err.name === 'CastError'
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные обновления пользователя или профиля' });
       }
@@ -82,13 +68,13 @@ const updateProfile = (req, res) => {
 const updateAvatar = (req, res) => {
   // обнавляем аватар по _id
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  // 2 { new: true }
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
         return res.status(400).send({ message: 'Переданы некорректные данные обновления аватара пользователя или профиля' });
       }
-      // 1 data:
-      return res.status(200).send({ data: user });
+      return res.status(200).send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

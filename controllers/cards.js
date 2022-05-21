@@ -58,7 +58,7 @@ const likesCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card == null) {
+      if (!card) {
         return res.status(404).send({ message: 'карточка не найдена' });
       }
       return res.status(200).send({ data: card });
@@ -74,7 +74,7 @@ const likesCard = (req, res) => {
 const dislikeCard = (req, res) => {
   // дизлайк карточки
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
