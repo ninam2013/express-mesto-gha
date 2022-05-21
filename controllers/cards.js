@@ -11,19 +11,18 @@ const getCards = (_, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
   // записываем в константу строку id пользователя
-  const ownerId = req.user._id;
+  const owner = req.user._id;
   // создаём карточку
-  Card.create({ name, link, owner: ownerId })
+  Card.create({ name, link, owner })
     // вернём записанные в базу данные
     .then((card) => {
       if (!card) {
         return res.status(400).send({ message: 'переданы некорректные данные создания карточки' });
       }
-      return res.send({
-        // возможно достаточно просто card???
-        name: card.name,
-        link: card.link,
-      });
+      if (!name || !link || !owner) {
+        return res.status(400).send({ message: 'переданы некорректные данные создания карточки' });
+      }
+      return res.status(200).send({ data: card });
     })
     // данные не записались, вернём ошибку
     .catch((err) => {
@@ -59,10 +58,10 @@ const likesCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) {
+      if (card == null) {
         return res.status(404).send({ message: 'карточка не найдена' });
       }
-      return res.status(200).send({ card });
+      return res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

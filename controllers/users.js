@@ -37,7 +37,6 @@ const createUser = (req, res) => {
       name: user.name,
       about: user.about,
       avatar: user.avatar,
-      // 1  _id: user._id,
       _id: user._id,
     }))
     // данные не записались, вернём ошибку
@@ -59,10 +58,16 @@ const updateProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about })
     .then((user) => {
       // 1 name.length < 2
-      if (name.length < 2 || name.length > 30 || about.length < 2 || about.length > 30) {
-        return res.status(400).send({ message: 'Переданы некорректные данные! обновления пользователя или профиля' });
+      // if (!name || !about) {
+      //   res.status(400).send({ message: 'Переданы некорректные данные' });
+      //   return;
+      // }
+      if (name.length < 2 || name.length > 30) {
+        return res.status(400).send({ message: 'Переданы некорректные данные name' });
       }
-      // 1 data:
+      if (about.length < 2 || about.length > 30) {
+        return res.status(400).send({ message: 'Переданы некорректные данные about' });
+      }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
@@ -82,7 +87,8 @@ const updateAvatar = (req, res) => {
       if (!user) {
         return res.status(400).send({ message: 'Переданы некорректные данные обновления аватара пользователя или профиля' });
       }
-      return res.status(200).send({ user });
+      // 1 data:
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
