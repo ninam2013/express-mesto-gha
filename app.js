@@ -15,11 +15,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 // обязательно должно быть!!! без этого не работает
 app.use(express.json());
 
-app.use('/', users);
-app.use('/', cards);
-
 // заглушка
-app.use((req, _, next) => {
+app.use((req, res, next) => {
   req.user = {
     // здесь _id созданного пользователя
     _id: '62868b1326c4e504695519fa',
@@ -28,11 +25,14 @@ app.use((req, _, next) => {
   next();
 });
 
+app.use('/users', users);
+app.use('/cards', cards);
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
 
-// Экспорт заглушки
-module.exports.createCard = (req, res) => {
+// Временно
+module.exports.createCard = (req) => {
   console.log(req.user._id);
 };
