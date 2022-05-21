@@ -15,9 +15,8 @@ const returnUser = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      return res.status(200).send(user);
+      return res.status(200).send({ data: user });
     })
-    // при запросе на изменение профиля updateProfile, выходит эта ошибка !!!!!!!!!!!!!!!!!!!!!!
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return res.status(400).send({ message: 'Переданы некорректные данные' });
@@ -38,6 +37,8 @@ const createUser = (req, res) => {
       name: user.name,
       about: user.about,
       avatar: user.avatar,
+      // 1  _id: user._id,
+      _id: user._id,
     }))
     // данные не записались, вернём ошибку
     .catch((err) => {
@@ -52,19 +53,21 @@ const createUser = (req, res) => {
     });
 };
 
-// при запросе выдаёт 404 ошибку!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const updateProfile = (req, res) => {
   // обнавляем данные пользователя по _id
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about })
     .then((user) => {
-      if (!user) {
-        return res.status(400).send({ message: 'Переданы некорректные данные обновления пользователя или профиля' });
+      // 1 name.length < 2
+      if (name.length < 2 || name.length > 30 || about.length < 2 || about.length > 30) {
+        return res.status(400).send({ message: 'Переданы некорректные данные! обновления пользователя или профиля' });
       }
-      return res.status(200).send({ user });
+      // 1 data:
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      // 1 err.name === 'CastError'
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные обновления пользователя или профиля' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
