@@ -56,7 +56,12 @@ const updateProfile = (req, res) => {
   // обнавляем данные пользователя по _id
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      return res.status(200).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные обновления пользователя или профиля' });
@@ -72,13 +77,13 @@ const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
-        return res.status(400).send({ message: 'Переданы некорректные данные обновления аватара пользователя или профиля' });
+        return res.status(404).send({ message: 'Аватар не найден' });
       }
-      return res.status(200).send({ user });
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные обновления аватара пользователя или профиля' });
+        return res.status(400).send({ message: 'Переданы некорректные данные обновления аватара пользователя' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
