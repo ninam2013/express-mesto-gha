@@ -42,9 +42,8 @@ const createUser = (req, res) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // const fields = Object.keys(err.errors).join(', ');
-        // return res.status(400).send({ message: `${fields} заполнено не верно ` });
-        return res.status(400).send({ message: 'Переданы некорректные данные' });
+        const fields = Object.keys(err.errors).join(', ');
+        return res.status(400).send({ message: `${fields} заполнено не верно ` });
       }
       if (err.code === '11000') {
         return res.status(409).send({ message: 'Такой пользователь есть в базе данных' });
