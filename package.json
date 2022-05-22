@@ -1,7 +1,7 @@
 {
   "name": "express-mesto-gha",
   "version": "0.0.1",
-  "description": "[![Tests for sprint 13](https://github.com/ninam2013/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/ninam2013/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests for sprint 14](https://github.com/ninam2013/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/ninam2013/express-mesto-gha/actions/workflows/tests-14-sprint.yml) # Проект Mesto фронтенд + бэкенд",
+  "description": "[![Tests for sprint 13](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests for sprint 14](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml) # Проект Mesto фронтенд + бэкенд",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
