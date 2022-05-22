@@ -42,8 +42,9 @@ const createUser = (req, res) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        const fields = Object.keys(err.errors).join(', ');
-        return res.status(400).send({ message: `${fields} заполнено не верно ` });
+        // const fields = Object.keys(err.errors).join(', ');
+        // return res.status(400).send({ message: `${fields} заполнено не верно ` });
+        return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       if (err.code === '11000') {
         return res.status(409).send({ message: 'Такой пользователь есть в базе данных' });
@@ -73,8 +74,7 @@ const updateProfile = (req, res) => {
 const updateAvatar = (req, res) => {
   // обнавляем аватар по _id
   const { avatar } = req.body;
-  // 2 { new: true }
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Аватар не найден' });
