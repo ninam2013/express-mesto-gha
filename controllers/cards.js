@@ -18,18 +18,13 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   // записываем в константу строку id пользователя
   const owner = req.user._id;
+  if (!name || !link || !owner) {
+    res.status(ERROR_CODE_400).send({ message: 'переданы некорректные данные создания карточки' });
+  }
   // создаём карточку
   Card.create({ name, link, owner })
     // вернём записанные в базу данные
-    .then((card) => {
-      if (!card) {
-        return res.status(ERROR_CODE_400).send({ message: 'переданы некорректные данные создания карточки' });
-      }
-      if (!name || !link || !owner) {
-        return res.status(ERROR_CODE_400).send({ message: 'переданы некорректные данные создания карточки' });
-      }
-      return res.status(ERROR_CODE_200).send({ data: card });
-    })
+    .then((card) => res.status(ERROR_CODE_200).send({ data: card }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
