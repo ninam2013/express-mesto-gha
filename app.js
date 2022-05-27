@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
+// 4
+const { login, createUser } = require('./controllers/users');
 const { ERROR_CODE_404 } = require('./utils/constants');
 
 const { PORT = 3000 } = process.env;
@@ -24,6 +26,9 @@ app.use((req, _, next) => {
 
 app.use('/users', users);
 app.use('/cards', cards);
+// 4 создаем два обработчика
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 // переход на несуществующий роут
 app.use((_, res) => {
