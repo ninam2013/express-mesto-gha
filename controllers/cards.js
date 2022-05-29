@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const {
   ERROR_CODE_200,
   ERROR_CODE_400,
+  ERROR_CODE_403,
   ERROR_CODE_404,
   ERROR_CODE_500,
 } = require('../utils/constants');
@@ -34,14 +35,45 @@ const createCard = (req, res) => {
     });
 };
 
+// const deleteCard = (req, res) => {
+//   // удаляем карточку по _id
+//   Card.findByIdAndRemove(req.params.cardsId)
+//     .then((card) => {
+//       if (!card) {
+//         return res.status(ERROR_CODE_404).send({ message: 'карточка не найдена' });
+//       }
+//       if (req.user._id !== card.owner.toString()) {
+//         return res.status(ERROR_CODE_403).send({ message: 'Нет прав на удаление' });
+//       }
+//       return res.status(ERROR_CODE_200).send({ card });
+//     })
+//     .catch((err) => {
+//       if (err.name === 'CastError') {
+//    return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные карточки' });
+//       }
+//       return res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка на сервере' });
+//     });
+// };
+
 const deleteCard = (req, res) => {
-  // удаляем карточку по _id
-  Card.findByIdAndRemove(req.params.cardsId)
+  // ищем карточку по _id
+  Card.findOne({ _id: req.params.cardsId })
     .then((card) => {
       if (!card) {
         return res.status(ERROR_CODE_404).send({ message: 'карточка не найдена' });
       }
-      return res.status(ERROR_CODE_200).send({ card });
+      if (req.user._id !== card.owner.toString()) {
+        return res.status(ERROR_CODE_403).send({ message: 'Нет прав на удаление' });
+      }
+      // удаляем карточку по _id
+      return Card.findByIdAndRemove(req.params.cardsId)
+        .then((cardData) => {
+          console.log('cardData', cardData);
+          return res.status(ERROR_CODE_200).send({ cardData });
+        })
+        .catch(() => {
+          res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка на сервере' });
+        });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

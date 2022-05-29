@@ -4,6 +4,8 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 // 4
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+
 const { ERROR_CODE_404 } = require('./utils/constants');
 
 const { PORT = 3000 } = process.env;
@@ -14,21 +16,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true })
 // обязательно должно быть!!! без этого не работает
 app.use(express.json());
 
-// заглушка временная
-app.use((req, _, next) => {
-  req.user = {
-    // здесь _id созданного пользователя
-    _id: '62868b1326c4e504695519fa',
-  };
-
-  next();
-});
-
-app.use('/users', users);
-app.use('/cards', cards);
-// 4 создаем два обработчика
+// создаем два обработчика
 app.post('/signin', login);
 app.post('/signup', createUser);
+// добавляем авторизацию
+app.use('/users', auth, users);
+app.use('/cards', auth, cards);
 
 // переход на несуществующий роут
 app.use((_, res) => {
@@ -38,8 +31,3 @@ app.use((_, res) => {
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
-
-// Временно
-module.exports.createCard = (req) => {
-  console.log(req.user._id);
-};
