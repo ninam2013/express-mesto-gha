@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
       message: 'Напишите правильный URL!',
     },
   },
-  // 1
   email: {
     type: String,
     required: true,

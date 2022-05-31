@@ -1,12 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 // библиотека проверки на соответствие
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
-const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { login, createUser } = require('./controllers/users');
 // ошибка
 const NotFoundError = require('./error/NotFoundError');
 
@@ -19,12 +19,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true })
 app.use(express.json());
 
 // создаем два обработчика
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
@@ -34,6 +28,14 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(8),
   }),
 }), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
 // добавляем авторизацию
 app.use('/users', auth, users);
 app.use('/cards', auth, cards);
@@ -42,6 +44,9 @@ app.use('/cards', auth, cards);
 app.use((_, res) => {
   res.status(NotFoundError).send({ message: 'Страница отсутствует' });
 });
+
+// обработчики ошибок предварительной валидации
+app.use(errors());
 
 // централизованная обработка ошибок
 app.use((err, req, res, next) => {
