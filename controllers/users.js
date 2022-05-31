@@ -11,7 +11,6 @@ const NotFoundError = require('../error/NotFoundError');
 const ConflictError = require('../error/ConflictError');
 
 const ERROR_CODE_200 = 200;
-const ERROR_CODE_201 = 201;
 
 const getUsers = (_, res, next) => {
   // все пользователи
@@ -52,7 +51,7 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     // вернём записанные в базу данные
-    .then((user) => res.status(ERROR_CODE_201).send({ data: user }))
+    .then((user) => res.status(ERROR_CODE_200).send({ data: user }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {

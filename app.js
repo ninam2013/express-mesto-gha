@@ -1,13 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
+// библиотека проверки на соответствие
+const { celebrate, Joi } = require('celebrate');
+
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 // ошибка
 const NotFoundError = require('./error/NotFoundError');
-// библиотека проверки на соответствие
-const { celebrate, Joi } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -44,6 +45,7 @@ app.use((_, res) => {
 
 // централизованная обработка ошибок
 app.use((err, req, res, next) => {
+  console.log(next);
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
 
