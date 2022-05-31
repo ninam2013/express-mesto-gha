@@ -21,6 +21,7 @@ const getUsers = (_, res, next) => {
 };
 
 const returnUser = (req, res, next) => {
+  console.log('pidr');
   // возвращаем пользователя по _id
   User.findById(req.params.userId)
     .then((user) => {

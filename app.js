@@ -7,6 +7,7 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
+const NotFoundError = require('./error/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -41,21 +42,38 @@ app.use('/cards', auth, cards);
 // обработчики ошибок предварительной валидации
 app.use(errors());
 
-// централизованная обработка ошибок
-app.use((err, req, res, next) => {
-  const messagesMap = {
-    404: 'Страница отсутствует',
-    500: 'На сервере произошла ошибка',
-  };
-  const message = messagesMap[err.statusCode] || err.message;
+// запрос к несуществующему роуту
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
 
-  res
-    .status(err.statusCode)
-    .send({
-      message,
-    });
+// централизованная обработка ошибок
+app.use('*', (err, req, res, next) => {
+  const status = err.statusCode || 500;
+  const message = err.message || 'На сервере произошла ошибка.';
+
+  res.status(status).send({
+    err,
+    message,
+  });
   next();
 });
+
+// централизованная обработка ошибок
+// app.use('*', (err, req, res, next) => {
+//   const messagesMap = {
+//     404: 'Страница отсутствует',
+//     500: 'На сервере произошла ошибка',
+//   };
+//   const message = messagesMap[err.statusCode] || err.message;
+
+//   return res
+//     //.status(err.statusCode)
+//     .send({
+//       status: 405,
+//       message,
+//     });
+// });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
