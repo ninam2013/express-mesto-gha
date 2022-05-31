@@ -1,7 +1,7 @@
+// подключаем для создание токена
 const jwt = require('jsonwebtoken');
-const {
-  ERROR_CODE_401,
-} = require('../utils/constants');
+
+const ERROR_CODE_401 = 401;
 
 // авторизация запросов
 module.exports = (req, res, next) => {

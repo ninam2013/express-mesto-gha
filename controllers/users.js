@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 // импортируем модель
 const User = require('../models/user');
-
+// импортируем ошибки
 const BadRequestError = require('../error/BadRequestError');
 const UnauthorizedError = require('../error/UnauthorizedError');
 const NotFoundError = require('../error/NotFoundError');
@@ -25,15 +25,15 @@ const returnUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(ERROR_CODE_200).send({ data: user });
+      res.status(ERROR_CODE_200).send({ data: user });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        return next(new BadRequestError('Переданы некорректные данные'));
+        next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -56,12 +56,12 @@ const createUser = (req, res, next) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
       if (err.code === '11000') {
-        return next(new ConflictError('Такой пользователь есть в базе данных'));
+        next(new ConflictError('Такой пользователь есть в базе данных'));
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -71,15 +71,15 @@ const updateProfile = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(ERROR_CODE_200).send({ data: user });
+      res.status(ERROR_CODE_200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -89,22 +89,22 @@ const updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(ERROR_CODE_200).send({ data: user });
+      res.status(ERROR_CODE_200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
-      return next(err);
+      next(err);
     });
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   // возвращаем метод findUserByCredentials проверки почты и пароля
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       // аутентификация успешна! создадим токен. Для этого вызовем метод jwt.sign с 3 аргументами
       // 1.пайлоад 2.секретный ключ(соль) 3.время действия токена
@@ -122,9 +122,9 @@ const returnProfile = (req, res, next) => {
   User.findOne({ _id: req.user._id })
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(ERROR_CODE_200).send({ data: user });
+      res.status(ERROR_CODE_200).send({ data: user });
     })
     .catch(next);
 };
