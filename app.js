@@ -7,8 +7,6 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
-// ошибка
-const NotFoundError = require('./error/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -40,28 +38,23 @@ app.post('/signin', celebrate({
 app.use('/users', auth, users);
 app.use('/cards', auth, cards);
 
-// переход на несуществующий роут
-app.use((_, res) => {
-  res.status(NotFoundError).send({ message: 'Страница отсутствует' });
-});
-
 // обработчики ошибок предварительной валидации
 app.use(errors());
 
 // централизованная обработка ошибок
 app.use((err, req, res, next) => {
-  console.log(next);
-  // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500, message } = err;
+  const messagesMap = {
+    404: 'Страница отсутствует',
+    500: 'На сервере произошла ошибка',
+  };
+  const message = messagesMap[err.statusCode] || err.message;
 
   res
-    .status(statusCode)
+    .status(err.statusCode)
     .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
+      message,
     });
+  next();
 });
 
 app.listen(PORT, () => {
