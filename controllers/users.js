@@ -52,13 +52,20 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     // вернём записанные в базу данные
-    .then((user) => res.status(ERROR_CODE_201).send({ data: user }))
+    .then((user) => res.status(ERROR_CODE_201).send({
+      // замечание 1
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      password: user.password,
+    }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
-      if (err.code === '11000') {
+      if (err.code === 11000) {
         next(new ConflictError('Такой пользователь есть в базе данных'));
       }
       next(err);
@@ -119,6 +126,8 @@ const login = (req, res, next) => {
 };
 
 const returnProfile = (req, res, next) => {
+  // даже не заходит сюда?????
+  console.log(req.user._id);
   User.findOne({ _id: req.user._id })
     .then((user) => {
       if (!user) {

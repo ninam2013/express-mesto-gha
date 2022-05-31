@@ -70,6 +70,7 @@ const likesCard = (req, res, next) => {
       if (!card) {
         next(new NotFoundError('Карточка не найдена'));
       }
+      console.log(card);
       res.status(ERROR_CODE_200).send({ data: card });
     })
     .catch((err) => {
