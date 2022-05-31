@@ -53,12 +53,9 @@ const createUser = (req, res, next) => {
     }))
     // вернём записанные в базу данные
     .then((user) => res.status(ERROR_CODE_201).send({
-      // замечание 1
       name: user.name,
       about: user.about,
       avatar: user.avatar,
-      email: user.email,
-      password: user.password,
     }))
     // данные не записались, вернём ошибку
     .catch((err) => {
