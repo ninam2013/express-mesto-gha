@@ -13,7 +13,7 @@ const ConflictError = require('../error/ConflictError');
 const getUsers = (_, res, next) => {
   // все пользователи
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -22,15 +22,15 @@ const returnUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        next(new BadRequestError('Переданы некорректные данные'));
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -57,12 +57,12 @@ const createUser = (req, res, next) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
       if (err.code === 11000) {
-        next(new ConflictError('Такой пользователь есть в базе данных'));
+        return next(new ConflictError('Такой пользователь есть в базе данных'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -72,15 +72,15 @@ const updateProfile = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -90,15 +90,15 @@ const updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
+        return next(new BadRequestError('Переданы некорректные данные обновления пользователя или профиля'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -111,7 +111,7 @@ const login = (req, res, next) => {
       // 1.пайлоад 2.секретный ключ(соль) 3.время действия токена
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // если всё хорошо возвращаем токен
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch(() => {
       // если что-то пошло не так
@@ -123,9 +123,9 @@ const returnProfile = (req, res, next) => {
   User.findOne({ _id: req.user._id })
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch(next);
 };
