@@ -5,12 +5,10 @@ const BadRequestError = require('../error/BadRequestError');
 const ForbiddenError = require('../error/ForbiddenError');
 const NotFoundError = require('../error/NotFoundError');
 
-const ERROR_CODE_200 = 200;
-
 const getCards = (_, res, next) => {
   // все карточки
   Card.find({})
-    .then((cards) => res.status(ERROR_CODE_200).send({ cards }))
+    .then((cards) => res.status(200).send({ cards }))
     .catch(next);
 };
 
@@ -24,7 +22,7 @@ const createCard = (req, res, next) => {
   // создаём карточку
   Card.create({ name, link, owner })
     // вернём записанные в базу данные
-    .then((card) => res.status(ERROR_CODE_200).send({ data: card }))
+    .then((card) => res.status(200).send({ data: card }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -47,7 +45,7 @@ const deleteCard = (req, res, next) => {
       // удаляем карточку по _id
       Card.findByIdAndRemove(req.params.cardsId)
         .then((cardData) => {
-          res.status(ERROR_CODE_200).send({ cardData });
+          res.status(200).send({ cardData });
         })
         .catch(next);
     })
@@ -70,7 +68,7 @@ const likesCard = (req, res, next) => {
       if (!card) {
         next(new NotFoundError('Карточка не найдена'));
       }
-      res.status(ERROR_CODE_200).send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -88,19 +86,16 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (card == null) {
-        next(new NotFoundError('Карточка не найдена'));
-      }
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'));
+        return next(new NotFoundError('Карточка не найдена'));
       }
-      res.status(ERROR_CODE_200).send({ card });
+      return res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
       }
-      next(err);
+      return next(err);
     });
 };
 

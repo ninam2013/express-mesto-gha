@@ -10,25 +10,21 @@ const UnauthorizedError = require('../error/UnauthorizedError');
 const NotFoundError = require('../error/NotFoundError');
 const ConflictError = require('../error/ConflictError');
 
-const ERROR_CODE_200 = 200;
-const ERROR_CODE_201 = 201;
-
 const getUsers = (_, res, next) => {
   // все пользователи
   User.find({})
-    .then((users) => res.status(ERROR_CODE_200).send(users))
+    .then((users) => res.status(200).send(users))
     .catch(next);
 };
 
 const returnUser = (req, res, next) => {
-  console.log('pidr');
   // возвращаем пользователя по _id
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(ERROR_CODE_200).send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
@@ -53,7 +49,7 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     // вернём записанные в базу данные
-    .then((user) => res.status(ERROR_CODE_201).send({
+    .then((user) => res.status(201).send({
       name: user.name,
       about: user.about,
       avatar: user.avatar,
@@ -78,7 +74,7 @@ const updateProfile = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(ERROR_CODE_200).send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -96,7 +92,7 @@ const updateAvatar = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(ERROR_CODE_200).send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -115,7 +111,7 @@ const login = (req, res, next) => {
       // 1.пайлоад 2.секретный ключ(соль) 3.время действия токена
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // если всё хорошо возвращаем токен
-      res.status(ERROR_CODE_200).send({ token });
+      res.status(200).send({ token });
     })
     .catch(() => {
       // если что-то пошло не так
@@ -124,14 +120,12 @@ const login = (req, res, next) => {
 };
 
 const returnProfile = (req, res, next) => {
-  // даже не заходит сюда?????
-  console.log(req.user._id);
   User.findOne({ _id: req.user._id })
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(ERROR_CODE_200).send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch(next);
 };

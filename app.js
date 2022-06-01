@@ -59,22 +59,6 @@ app.use('*', (err, req, res, next) => {
   next();
 });
 
-// централизованная обработка ошибок
-// app.use('*', (err, req, res, next) => {
-//   const messagesMap = {
-//     404: 'Страница отсутствует',
-//     500: 'На сервере произошла ошибка',
-//   };
-//   const message = messagesMap[err.statusCode] || err.message;
-
-//   return res
-//     //.status(err.statusCode)
-//     .send({
-//       status: 405,
-//       message,
-//     });
-// });
-
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
